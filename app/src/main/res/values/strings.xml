@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Iris Placements</string>
     <string name="apply">APPLY</string>
+
+    <string name="GET_COMPANIES">http://10.3.0.52:6001/hrms/placement/companies.json</string>
+    <string name="POST_APPLICATION">http://10.3.0.52:6001/hrms/placement/status.json</string>
 </resources>

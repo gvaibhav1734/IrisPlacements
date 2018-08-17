@@ -5,22 +5,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/main_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="4dp"
+        android:theme="@style/Toolbar"
+        app:layout_constraintTop_toTopOf="parent" />
     <android.support.design.widget.TabLayout
         android:id="@+id/main_tl_tabs"
+        android:background="@color/colorPrimary"
+        android:elevation="4dp"
+        app:tabIndicatorColor="@color/white"
+        app:tabIndicatorHeight="3dp"
+        app:tabMode="fixed"
+        app:tabPadding="5dp"
+        app:tabSelectedTextColor="@color/white"
+        app:tabTextColor="@color/whitish"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <TextView
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Wow, such empty"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/main_toolbar"/>
     <android.support.v4.view.ViewPager
         android:id="@+id/main_vp_list_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="0dp"
+        android:background="@color/whitishbg"
+        app:layout_constraintTop_toBottomOf="@id/main_tl_tabs"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>
