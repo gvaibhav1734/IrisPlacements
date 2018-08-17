@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     class CustomPagerAdapter extends PagerAdapter {
         public static final int COMPANIES = 0;
         public static final int APPLICATIONS = 1;
-        private String titles[] = {"Companies", "Applications"};
+        private String titles[] = {"Companies", "My Applications"};
         private int layouts[] = {R.layout.layout_companies, R.layout.layout_applications};
 
         CustomPagerAdapter() {
