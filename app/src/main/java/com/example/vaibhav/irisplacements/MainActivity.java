@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             if (position == COMPANIES) {
                 String url = getString(R.string.GET_COMPANIES);
                 recyclerView = rootView.findViewById(R.id.companies_rv_list);
+                recyclerView.setNestedScrollingEnabled(false);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                 JsonArrayRequest companiesRequest = new JsonArrayRequest(
                         Request.Method.GET,
@@ -122,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
                         .addToRequestQueue(companiesRequest);
             } else {
                 recyclerView = rootView.findViewById(R.id.applications_rv_list);
+                recyclerView.setNestedScrollingEnabled(false);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                 recyclerView.setAdapter(mApplicationsListAdapter);
             }
