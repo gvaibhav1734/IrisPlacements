@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -33,6 +34,7 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.Vi
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView company_name, recruitment_date, deadline;
         Button apply;
+        ProgressBar progressBar;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -40,6 +42,7 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.Vi
             recruitment_date = itemView.findViewById(R.id.list_item_tv_recruitment_date);
             deadline = itemView.findViewById(R.id.list_item_tv_deadline);
             apply = itemView.findViewById(R.id.list_item_btn_apply);
+            progressBar = itemView.findViewById(R.id.list_item_pb_progress);
         }
     }
 
@@ -61,6 +64,8 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.Vi
         holder.apply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                holder.progressBar.setVisibility(View.VISIBLE);
+                holder.apply.setVisibility(View.INVISIBLE);
                 // Make a POST request to obtain commit:true as a json response.
                 JSONObject json = null;
                 try {
@@ -82,6 +87,9 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.Vi
                                 instance.addToApplicationsList(
                                         entries.get(holder.getAdapterPosition())
                                 );
+                                holder.progressBar.setVisibility(View.GONE);
+                                holder.apply.setText("CANCEL");
+                                holder.apply.setVisibility(View.VISIBLE);
                             }
                         },
                         new Response.ErrorListener() {
