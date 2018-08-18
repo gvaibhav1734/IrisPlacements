@@ -61,6 +61,7 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.Vi
         holder.apply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Make a POST request to obtain commit:true as a json response.
                 JSONObject json = null;
                 try {
                     json = new JSONObject();
@@ -86,7 +87,7 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.Vi
                         new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-
+                                Log.d(TAG, "Volley commitRequest failure : " + error.getMessage());
                             }
                         }
                 );
@@ -99,7 +100,6 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.Vi
     public int getItemCount() {
         return entries.size();
     }
-
 
     public void setEntries(List<Entry> entries) {
         this.entries = entries;
