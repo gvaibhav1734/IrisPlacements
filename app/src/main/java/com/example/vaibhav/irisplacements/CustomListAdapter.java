@@ -23,12 +23,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.ViewHolder> {
+
     private static final String TAG = "CustomListAdapter";
     private Context mContext;
     private List<Entry> entries = new ArrayList<>();
+    private int type; // To determine which list(companies or applications)
 
-    CustomListAdapter(Context context) {
+    CustomListAdapter(Context context, int type) {
         this.mContext = context;
+        this.type = type;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -57,49 +60,86 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        Log.d(TAG, entries.get(position).getUrl());
+        // By default text VISIBLE and progress bar INVISIBLE
+        holder.progressBar.setVisibility(View.GONE);
+        holder.apply.setVisibility(View.VISIBLE);
         holder.company_name.setText(entries.get(position).getCompany().getName());
         holder.recruitment_date.setText(entries.get(position).getRecruitment_date());
         holder.deadline.setText(entries.get(position).getDeadline());
+        if (type == MainActivity.APPLICATIONS) {
+            holder.apply.setText(R.string.cancel);
+            holder.apply.setTextColor(mContext.getResources().getColor(R.color.red));
+        } else {
+            holder.apply.setText(R.string.apply);
+        }
         holder.apply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 holder.progressBar.setVisibility(View.VISIBLE);
                 holder.apply.setVisibility(View.INVISIBLE);
-                // Make a POST request to obtain commit:true as a json response.
-                JSONObject json = null;
-                try {
-                    json = new JSONObject();
-                    json.put("commit", "true");
-                } catch (JSONException error) {
-                    Log.e(TAG, "commit JSON creation error : " + error.getMessage());
+                if (entries.get(holder.getAdapterPosition()).isSelected()) {
+                    if (type == MainActivity.COMPANIES) {
+                        // Display message "Already applied"
+                        MainActivity instance = (MainActivity) mContext;
+                        ((MainActivity) mContext).snackbarMessage("Already Applied.");
+                        holder.progressBar.setVisibility(View.GONE);
+                        holder.apply.setVisibility(View.VISIBLE);
+                    } else if (type == MainActivity.APPLICATIONS) {
+                        // Set entry.selected false in companies list
+                        MainActivity instance = (MainActivity) mContext;
+                        instance.findEntryInCompanies(entries.get(holder.getAdapterPosition()));
+                        // Remove the entry from applications list.
+                        entries.remove(holder.getAdapterPosition());
+                        notifyItemRemoved(holder.getAdapterPosition());
+                    }
+                } else {
+                    // Make a POST request to obtain commit:true as a json response.
+                    JSONObject json = null;
+                    try {
+                        json = new JSONObject();
+                        json.put("commit", "true");
+                    } catch (JSONException error) {
+                        Log.e(TAG, "commit JSON creation error : " + error.getMessage());
+                    }
+                    String url = mContext.getString(R.string.POST_APPLICATION);
+                    JsonObjectRequest commitRequest = new JsonObjectRequest(
+                            Request.Method.POST,
+                            url,
+                            json,
+                            new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    Log.d(TAG, "Volley commitRequest success : " + response.toString());
+                                    Log.d(TAG, "For Entry : "
+                                            + entries.get(holder.getAdapterPosition())
+                                            .getCompany()
+                                            .getName());
+                                    holder.progressBar.setVisibility(View.GONE);
+                                    holder.apply.setVisibility(View.VISIBLE);
+                                    try {
+                                        if (response.getBoolean("success")) {
+                                            MainActivity instance = (MainActivity) mContext;
+                                            instance.addToApplicationsList(
+                                                    entries.get(holder.getAdapterPosition())
+                                            );
+                                            entries.get(holder.getAdapterPosition()).setSelected(true);
+                                            instance.snackbarMessage("Applied.");
+                                        }
+                                    } catch (JSONException error) {
+                                        Log.e(TAG, "Volley commitRequest response json error : "
+                                                + error.getMessage());
+                                    }
+                                }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.e(TAG, "Volley commitRequest failure : " + error.getMessage());
+                                }
+                            }
+                    );
+                    VolleyHelper.getInstance(mContext).addToRequestQueue(commitRequest);
                 }
-                String url = mContext.getString(R.string.POST_APPLICATION);
-                JsonObjectRequest commitRequest = new JsonObjectRequest(
-                        Request.Method.POST,
-                        url,
-                        json,
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                Log.d(TAG, "Volley commitRequest success : " + response.toString());
-                                MainActivity instance = (MainActivity) mContext;
-                                instance.addToApplicationsList(
-                                        entries.get(holder.getAdapterPosition())
-                                );
-                                holder.progressBar.setVisibility(View.GONE);
-                                holder.apply.setText("CANCEL");
-                                holder.apply.setVisibility(View.VISIBLE);
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.d(TAG, "Volley commitRequest failure : " + error.getMessage());
-                            }
-                        }
-                );
-                VolleyHelper.getInstance(mContext).addToRequestQueue(commitRequest);
             }
         });
     }
@@ -120,5 +160,13 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.Vi
     public void addEntry(Entry entry) {
         entries.add(entry);
         notifyItemInserted(entries.size() - 1);
+    }
+
+    public Entry find(Entry entry) {
+        for (Entry entry1 : entries) {
+            if (entry1.getId() == entry.getId())
+                return entry1;
+        }
+        return null;
     }
 }

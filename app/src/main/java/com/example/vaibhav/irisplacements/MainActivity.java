@@ -31,15 +31,21 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+    public static final int COMPANIES = 0;
+    public static final int APPLICATIONS = 1;
     private ViewPager mViewPager;
     private CustomListAdapter mCompaniesListAdapter;
     private CustomListAdapter mApplicationsListAdapter;
     private ProgressBar progressBar;
+    private boolean loadFromServer=true;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        // Save only applications list.
+        outState.putParcelableArrayList(
+                "companiesList",
+                (ArrayList<Entry>) mCompaniesListAdapter.getEntries()
+        );
         outState.putParcelableArrayList(
                 "applicationsList",
                 (ArrayList<Entry>) mApplicationsListAdapter.getEntries()
@@ -56,10 +62,14 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
         mViewPager.setAdapter(new CustomPagerAdapter());
         toolbar.setTitle(R.string.app_name);
-        mApplicationsListAdapter = new CustomListAdapter(this);
+        mApplicationsListAdapter = new CustomListAdapter(this,APPLICATIONS);
+        mCompaniesListAdapter = new CustomListAdapter(this,COMPANIES);
         if (savedInstanceState != null) {
-            List<Entry> ae = savedInstanceState.getParcelableArrayList("applicationsList");
-            mApplicationsListAdapter.setEntries(ae);
+            List<Entry> a1 = savedInstanceState.getParcelableArrayList("companiesList");
+            mCompaniesListAdapter.setEntries(a1);
+            List<Entry> a2 = savedInstanceState.getParcelableArrayList("applicationsList");
+            mApplicationsListAdapter.setEntries(a2);
+            loadFromServer=false;
         }
     }
 
@@ -67,9 +77,14 @@ public class MainActivity extends AppCompatActivity {
         mApplicationsListAdapter.addEntry(entry);
     }
 
+    public void findEntryInCompanies(Entry entry) {
+        mCompaniesListAdapter.find(entry).setSelected(false);
+    }
+
+    public void snackbarMessage(String message) {
+        Snackbar.make(mViewPager,message,Snackbar.LENGTH_SHORT).show();
+    }
     class CustomPagerAdapter extends PagerAdapter {
-        public static final int COMPANIES = 0;
-        public static final int APPLICATIONS = 1;
         private String titles[] = {"Companies", "My Applications"};
         private int layouts[] = {R.layout.layout_companies, R.layout.layout_applications};
 
@@ -94,7 +109,12 @@ public class MainActivity extends AppCompatActivity {
                 recyclerView = rootView.findViewById(R.id.companies_rv_list);
                 recyclerView.setNestedScrollingEnabled(false);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                makeRequest(rootView, recyclerView);
+                if(loadFromServer)
+                    makeRequest(rootView, recyclerView);
+                else {
+                    recyclerView.setAdapter(mCompaniesListAdapter);
+                    progressBar.setVisibility(View.GONE);
+                }
             } else {
                 recyclerView = rootView.findViewById(R.id.applications_rv_list);
                 recyclerView.setNestedScrollingEnabled(false);
@@ -123,8 +143,6 @@ public class MainActivity extends AppCompatActivity {
                                     GsonHelper.getInstance()
                                             .getGson().fromJson(response.toString(), listType);
                             Log.d(TAG, "List after GSON : " + entries.toString());
-                            mCompaniesListAdapter =
-                                    new CustomListAdapter(MainActivity.this);
                             mCompaniesListAdapter.setEntries(entries);
                             recyclerView.setAdapter(mCompaniesListAdapter);
                             mCompaniesListAdapter.notifyDataSetChanged();

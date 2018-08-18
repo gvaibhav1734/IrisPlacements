@@ -4,13 +4,15 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 
-public class Entry implements Parcelable{
+public class Entry implements Parcelable {
     private int id;
     private String recruitment_date;
     private String deadline;
     private String recruitment_type;
     private Company company;
     private String url;
+
+    private boolean selected;
 
     public int getId() {
         return id;
@@ -61,6 +63,11 @@ public class Entry implements Parcelable{
     }
 
     @Override
+    public boolean equals(Object object) {
+        return ((Entry) object).getId() == this.getId();
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -71,8 +78,9 @@ public class Entry implements Parcelable{
         dest.writeString(recruitment_date);
         dest.writeString(deadline);
         dest.writeString(recruitment_type);
-        dest.writeParcelable(company,0);
+        dest.writeParcelable(company, 0);
         dest.writeString(url);
+        dest.writeInt(isSelected() ? 1 : 0);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator<Entry>() {
@@ -87,6 +95,7 @@ public class Entry implements Parcelable{
             Company company = source.readParcelable(Company.class.getClassLoader());
             entry.setCompany(company);
             entry.setUrl(source.readString());
+            entry.setSelected(source.readInt() == 1);
             return entry;
         }
 
@@ -95,8 +104,17 @@ public class Entry implements Parcelable{
             return new Entry[0];
         }
     };
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
 }
-class Company implements Parcelable{
+
+class Company implements Parcelable {
     private int id;
     private String name;
     private String company_type;
