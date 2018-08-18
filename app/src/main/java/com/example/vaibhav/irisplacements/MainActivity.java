@@ -83,51 +83,18 @@ public class MainActivity extends AppCompatActivity {
 
         @NonNull
         @Override
-        public Object instantiateItem(@NonNull ViewGroup container, int position) {
+        public Object instantiateItem(@NonNull final ViewGroup container, int position) {
             LayoutInflater layoutInflater = getLayoutInflater();
             final View rootView = layoutInflater.inflate(layouts[position], container, false);
             container.addView(rootView);
             final RecyclerView recyclerView;
             if (position == COMPANIES) {
                 progressBar = findViewById(R.id.companies_pb_progress);
-                String url = getString(R.string.GET_COMPANIES);
+                progressBar.setVisibility(View.VISIBLE);
                 recyclerView = rootView.findViewById(R.id.companies_rv_list);
                 recyclerView.setNestedScrollingEnabled(false);
                 recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                JsonArrayRequest companiesRequest = new JsonArrayRequest(
-                        Request.Method.GET,
-                        url,
-                        null,
-                        new Response.Listener<JSONArray>() {
-                            @Override
-                            public void onResponse(JSONArray response) {
-                                Log.d(TAG, "Volley success : " + response.toString());
-                                Type listType = new TypeToken<ArrayList<Entry>>() {
-                                }.getType();
-                                ArrayList<Entry> entries =
-                                        GsonHelper.getInstance()
-                                                .getGson().fromJson(response.toString(), listType);
-                                Log.d(TAG, "List after GSON : " + entries.toString());
-                                mCompaniesListAdapter =
-                                        new CustomListAdapter(MainActivity.this);
-                                mCompaniesListAdapter.setEntries(entries);
-                                recyclerView.setAdapter(mCompaniesListAdapter);
-                                mCompaniesListAdapter.notifyDataSetChanged();
-                                progressBar.setVisibility(View.GONE);
-                                Log.d(TAG, "Size : " + mCompaniesListAdapter.getItemCount());
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.e(TAG, "Volley companiesRequest error : " + error.getMessage());
-                                Snackbar.make(rootView,"Connection Error?",Snackbar.LENGTH_SHORT)
-                                        .show();
-                            }
-                        }
-                );
-                VolleyHelper.getInstance(getApplicationContext())
-                        .addToRequestQueue(companiesRequest);
+                makeRequest(rootView, recyclerView);
             } else {
                 recyclerView = rootView.findViewById(R.id.applications_rv_list);
                 recyclerView.setNestedScrollingEnabled(false);
@@ -135,6 +102,55 @@ public class MainActivity extends AppCompatActivity {
                 recyclerView.setAdapter(mApplicationsListAdapter);
             }
             return rootView;
+        }
+
+        /**
+         * Makes request and populates recyclerView contained in rootView
+         * with json obtained from server.
+         */
+        void makeRequest(final View rootView, final RecyclerView recyclerView) {
+            final JsonArrayRequest companiesRequest = new JsonArrayRequest(
+                    Request.Method.GET,
+                    getString(R.string.GET_COMPANIES),
+                    null,
+                    new Response.Listener<JSONArray>() {
+                        @Override
+                        public void onResponse(JSONArray response) {
+                            Log.d(TAG, "Volley success : " + response.toString());
+                            Type listType = new TypeToken<ArrayList<Entry>>() {
+                            }.getType();
+                            ArrayList<Entry> entries =
+                                    GsonHelper.getInstance()
+                                            .getGson().fromJson(response.toString(), listType);
+                            Log.d(TAG, "List after GSON : " + entries.toString());
+                            mCompaniesListAdapter =
+                                    new CustomListAdapter(MainActivity.this);
+                            mCompaniesListAdapter.setEntries(entries);
+                            recyclerView.setAdapter(mCompaniesListAdapter);
+                            mCompaniesListAdapter.notifyDataSetChanged();
+                            progressBar.setVisibility(View.GONE);
+                            Log.d(TAG, "Size : " + mCompaniesListAdapter.getItemCount());
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(final VolleyError error) {
+                            Log.e(TAG, "Volley companiesRequest error : " + error.getMessage());
+                            Snackbar.make(rootView, "Connection Error", Snackbar.LENGTH_INDEFINITE)
+                                    .setAction("RETRY", new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Log.d(TAG,"Make request (Connection retry) attempted");
+                                            // Making one more request.
+                                            makeRequest(rootView, recyclerView);
+                                        }
+                                    })
+                                    .show();
+                        }
+                    }
+            );
+            VolleyHelper.getInstance(getApplicationContext())
+                    .addToRequestQueue(companiesRequest);
         }
 
         @Override
