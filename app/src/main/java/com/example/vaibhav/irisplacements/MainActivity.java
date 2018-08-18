@@ -3,6 +3,7 @@ package com.example.vaibhav.irisplacements;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private CustomListAdapter mCompaniesListAdapter;
     private CustomListAdapter mApplicationsListAdapter;
+    private ProgressBar progressBar;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -49,9 +52,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         TabLayout tabLayout = findViewById(R.id.main_tl_tabs);
         mViewPager = findViewById(R.id.main_vp_list_container);
+        Toolbar toolbar = findViewById(R.id.main_toolbar);
         tabLayout.setupWithViewPager(mViewPager);
         mViewPager.setAdapter(new CustomPagerAdapter());
-        Toolbar toolbar = findViewById(R.id.main_toolbar);
         toolbar.setTitle(R.string.app_name);
         mApplicationsListAdapter = new CustomListAdapter(this);
         if (savedInstanceState != null) {
@@ -82,10 +85,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public Object instantiateItem(@NonNull ViewGroup container, int position) {
             LayoutInflater layoutInflater = getLayoutInflater();
-            View rootView = layoutInflater.inflate(layouts[position], container, false);
+            final View rootView = layoutInflater.inflate(layouts[position], container, false);
             container.addView(rootView);
             final RecyclerView recyclerView;
             if (position == COMPANIES) {
+                progressBar = findViewById(R.id.companies_pb_progress);
                 String url = getString(R.string.GET_COMPANIES);
                 recyclerView = rootView.findViewById(R.id.companies_rv_list);
                 recyclerView.setNestedScrollingEnabled(false);
@@ -109,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                                 mCompaniesListAdapter.setEntries(entries);
                                 recyclerView.setAdapter(mCompaniesListAdapter);
                                 mCompaniesListAdapter.notifyDataSetChanged();
+                                progressBar.setVisibility(View.GONE);
                                 Log.d(TAG, "Size : " + mCompaniesListAdapter.getItemCount());
                             }
                         },
@@ -116,6 +121,8 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onErrorResponse(VolleyError error) {
                                 Log.e(TAG, "Volley companiesRequest error : " + error.getMessage());
+                                Snackbar.make(rootView,"Connection Error?",Snackbar.LENGTH_SHORT)
+                                        .show();
                             }
                         }
                 );
