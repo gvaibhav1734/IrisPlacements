@@ -135,6 +135,10 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.Vi
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
                                     Log.e(TAG, "Volley commitRequest failure : " + error.getMessage());
+                                    holder.progressBar.setVisibility(View.GONE);
+                                    holder.apply.setVisibility(View.VISIBLE);
+                                    ((MainActivity) mContext).snackbarMessage("Connection Lost.");
+
                                 }
                             }
                     );
