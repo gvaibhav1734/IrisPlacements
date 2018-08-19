@@ -35,15 +35,15 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.Vi
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        TextView company_name, recruitment_date, deadline;
+        TextView company_name, companyType, recruitmentType;
         Button apply;
         ProgressBar progressBar;
 
         ViewHolder(View itemView) {
             super(itemView);
             company_name = itemView.findViewById(R.id.list_item_tv_company_name);
-            recruitment_date = itemView.findViewById(R.id.list_item_tv_recruitment_date);
-            deadline = itemView.findViewById(R.id.list_item_tv_deadline);
+            companyType = itemView.findViewById(R.id.list_item_tv_company_type);
+            recruitmentType = itemView.findViewById(R.id.list_item_tv_recruitment_type);
             apply = itemView.findViewById(R.id.list_item_btn_apply);
             progressBar = itemView.findViewById(R.id.list_item_pb_progress);
         }
@@ -74,8 +74,8 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.Vi
             }
         });
         holder.company_name.setText(entries.get(position).getCompany().getName());
-        holder.recruitment_date.setText(entries.get(position).getRecruitment_date());
-        holder.deadline.setText(entries.get(position).getDeadline());
+        holder.recruitmentType.setText(entries.get(position).getRecruitment_type());
+        holder.companyType.setText(entries.get(position).getCompany().getCompany_type());
         if (type == MainActivity.APPLICATIONS) {
             holder.apply.setText(R.string.cancel);
             holder.apply.setTextColor(mContext.getResources().getColor(R.color.red));
