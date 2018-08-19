@@ -63,6 +63,16 @@ public class CustomListAdapter extends RecyclerView.Adapter<CustomListAdapter.Vi
         // By default text VISIBLE and progress bar INVISIBLE
         holder.progressBar.setVisibility(View.GONE);
         holder.apply.setVisibility(View.VISIBLE);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EntryDialog entryDialog =
+                        EntryDialog.getInstance(entries.get(holder.getAdapterPosition()));
+                entryDialog.show(((MainActivity)mContext).getFragmentManager(),"entry");
+                entryDialog.setCancelable(true);
+            }
+        });
         holder.company_name.setText(entries.get(position).getCompany().getName());
         holder.recruitment_date.setText(entries.get(position).getRecruitment_date());
         holder.deadline.setText(entries.get(position).getDeadline());

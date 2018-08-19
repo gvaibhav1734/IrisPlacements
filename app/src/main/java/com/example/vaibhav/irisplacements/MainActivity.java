@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
          * with json obtained from server.
          */
         void makeRequest(final View rootView, final RecyclerView recyclerView) {
+            progressBar.setVisibility(View.VISIBLE);
             final JsonArrayRequest companiesRequest = new JsonArrayRequest(
                     Request.Method.GET,
                     getString(R.string.GET_COMPANIES),
@@ -154,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onErrorResponse(final VolleyError error) {
                             Log.e(TAG, "Volley companiesRequest error : " + error.getMessage());
+                            progressBar.setVisibility(View.GONE);
                             Snackbar.make(rootView, "Connection Error", Snackbar.LENGTH_INDEFINITE)
                                     .setAction("RETRY", new View.OnClickListener() {
                                         @Override
