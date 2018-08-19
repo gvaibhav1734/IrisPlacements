@@ -15,6 +15,6 @@
     <!-- Font sizes -->
     <dimen name="text_size_small">13sp</dimen>
     <dimen name="text_size_normal">15sp</dimen>
-    <dimen name="text_size_large">18dp</dimen>
-    <dimen name="text_size_extra_large">20dp</dimen>
+    <dimen name="text_size_large">18sp</dimen>
+    <dimen name="text_size_extra_large">20sp</dimen>
 </resources>
