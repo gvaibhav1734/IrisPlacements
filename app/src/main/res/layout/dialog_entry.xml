@@ -85,7 +85,7 @@
         android:id="@+id/dialog_tv_recruitment_date"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_normal"
+        android:layout_margin="@dimen/margin_small"
         android:drawableLeft="@drawable/ic_time"
         android:drawablePadding="@dimen/padding_normal"
         android:drawableStart="@drawable/ic_time"
@@ -100,7 +100,7 @@
         android:id="@+id/dialog_tv_deadline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_normal"
+        android:layout_margin="@dimen/margin_small"
         android:drawableLeft="@drawable/ic_time_deadline"
         android:drawablePadding="@dimen/padding_normal"
         android:drawableStart="@drawable/ic_time_deadline"
@@ -108,13 +108,14 @@
         android:includeFontPadding="false"
         android:padding="@dimen/padding_normal"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_tv_recruitment_date" />
 
     <TextView
         android:id="@+id/dialog_tv_url"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_normal"
+        android:layout_margin="@dimen/margin_small"
         android:drawableLeft="@drawable/ic_url"
         android:drawablePadding="@dimen/padding_normal"
         android:drawableStart="@drawable/ic_url"
